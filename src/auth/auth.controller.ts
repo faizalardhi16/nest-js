@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { CreateUserInterface } from "src/interface/CreateUserInterface";
+import { CreateUserInterface } from "interface/CreateUserInterface";
 
 @Controller('auth')
 

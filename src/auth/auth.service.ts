@@ -1,15 +1,16 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { AuthInterface } from './interface';
+import { AuthInterface, LoginInterface } from './interface';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 import { objectResponse } from 'utils/objectResponse';
 import * as argon from "argon2";
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService){}
+    constructor(private prisma: PrismaService, private jwt: JwtService){}
 
     async signup(body: AuthInterface): Promise<ResponseInterface> {
         try {
@@ -20,7 +21,10 @@ export class AuthService {
             const user = await this.prisma.user.create({
                 data:{
                     email: body.email,
-                    hash
+                    hash,
+                    role: body.role,
+                    division: body.division,
+                    pc: 1
                 },
             });
 
@@ -35,7 +39,6 @@ export class AuthService {
 
             return new Promise((resolve) => resolve(response));
         } catch (error) {
-            console.log(`error log ${error}`)
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code = 'P2002'){
                     const exc = new ForbiddenException('Credentials Taken')                    
@@ -56,7 +59,7 @@ export class AuthService {
         }
     }
 
-    async signin(body: AuthInterface): Promise<ResponseInterface>{
+    async signin(body: LoginInterface): Promise<ResponseInterface>{
         const user = await this.prisma.user.findUnique({
             where:{
                 email: body.email
@@ -85,14 +88,37 @@ export class AuthService {
             });
         }
 
-        delete user.hash
+        const token = await this.signToken(user.id, user.email, user.role);
 
         return objectResponse({ 
             status: 'Success', 
             code: 200, 
             message: 'Successfully to login', 
-            data: user
+            data: token
         });
+    }
+
+    async signToken(
+        userId: number, 
+        email: string,
+        role: string
+    ): Promise<{access_token: string;}>{
+        const payload = {
+            sub: userId,
+            email,
+            role
+        }
+
+        const secret = process.env.JWT_SECRET || ''
+
+        const token = await this.jwt.signAsync(payload, {
+            expiresIn: '15m',
+            secret
+        })
+
+        return{
+            access_token: token
+        }
     }
 
     // async updateUser(body: Partial<AuthInterface>): Promise<ResponseInterface>{

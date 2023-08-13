@@ -17,11 +17,17 @@ model User{
 
   email String @unique
   hash String
+  role String?
+  pc   Int
+  division String
+  
 
-  fullName String?
+  firstName String?
   lastName String?
   address String?
+
   bookmark Bookmark[]
+  assessment Assessment[]
 
   @@map("users")
 
@@ -41,3 +47,35 @@ model Bookmark{
 
   @@map("bookmarks")
 }
+
+model Assessment{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title_assesse String
+  description String @db.Text
+  file_name String?
+  user_id Int
+
+  category_id Int
+
+  user User @relation(fields: [user_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@map("assessments")
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  code String @unique
+
+  assessment Assessment[]
+
+  @@map("categories")
+}
+

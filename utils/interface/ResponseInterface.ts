@@ -5,7 +5,6 @@ interface Meta{
     message: string;
 }
 
-
 export interface ResponseInterface {
     meta: Meta;
     data: any;

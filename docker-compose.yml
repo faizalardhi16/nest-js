@@ -8,6 +8,13 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
+    restart: always
+    networks:
+      - dev-db
+  dev-be:
+    build: .
+    ports:
+      - 3121:3121
     networks:
       - dev-db
 networks:

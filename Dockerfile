@@ -16,4 +16,6 @@ RUN pnpm run build
 
 EXPOSE 3121
 
+RUN npx prisma migrate dev --name migrate_database
+
 CMD ["node", "dist/src/main.js"]

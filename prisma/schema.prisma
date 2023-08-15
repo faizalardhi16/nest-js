@@ -28,6 +28,7 @@ model User{
 
   bookmark Bookmark[]
   assessment Assessment[]
+  interview Interview[]
 
   @@map("users")
 
@@ -77,5 +78,19 @@ model Category{
   assessment Assessment[]
 
   @@map("categories")
+}
+
+model Interview{
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  description String
+  user_id Int
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("interviews")
 }
 

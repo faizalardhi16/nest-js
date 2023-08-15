@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { AssessmentModule } from './assessment/assessment.module';
+import { InterviewModule } from './interview/interview.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { AssessmentModule } from './assessment/assessment.module';
       isGlobal: true,
       envFilePath: '.env'
     }), 
-    DatabaseModule, AssessmentModule
+    DatabaseModule, AssessmentModule, InterviewModule
   ],
 })
 export class AppModule {}

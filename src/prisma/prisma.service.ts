@@ -7,7 +7,7 @@ export class PrismaService extends PrismaClient {
         super({
             datasources: {
                 db: {
-                    url: process.env.DATABASE_URL
+                    url: process.env.NODE_ENV === "production" ? process.env.DATABASE_URL_PRODUCTION : process.env.DATABASE_URL
                 }
             }
         })

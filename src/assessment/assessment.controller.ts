@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, FileTypeValidator, Get, HttpCode, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AssessmentService } from './assessment.service';
 import { ICreateAssessment } from './interface/IRequestAssessment';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
@@ -8,6 +8,8 @@ import { Role } from 'utils/role.enum';
 import { Roles } from 'utils/roles.decorator';
 import { RoleGuard } from 'src/auth/strategy/role.strategy';
 import { Assessment } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('assessment')
 export class AssessmentController {
@@ -45,5 +47,48 @@ export class AssessmentController {
     getDetailAssessment(@Param() param:{id: number;}): Promise<ResponseInterface>{
         return this.service.findOneAssessment(param.id)
     }
+
+    @Post('local')
+    @UseInterceptors(
+      FileInterceptor('file', {
+        storage: diskStorage({
+          destination: (req,file,cb) => {
+            cb(null, 'public/img')
+          },
+          filename: (req, file, cb) => {
+            cb(null, file.originalname);
+          },
+        }),
+      }),
+    )
+    async local(@UploadedFile() file: Express.Multer.File) {
+      return {
+        statusCode: 200,
+        data: file.path,
+      };
+    }
+
+    // @Post('upload')
+    // @UseInterceptors(FileInterceptor('file', {
+    //     storage: diskStorage({
+    //         destination: "public/img",
+    //         filename: (req, file, cb) => {
+    //             cb(null, file.originalname + 'hello')
+    //         }
+    //     })
+    // }))
+    // uploadFile(@UploadedFile(
+    //     new ParseFilePipe({
+    //         validators:[
+    //             new MaxFileSizeValidator({maxSize: 1024 * 1024 * 5}),
+    //             new FileTypeValidator({fileType: 'application/pdf'})
+    //         ]
+    //     })
+    // ) file: Express.Multer.File){
+    //     return{
+    //         path: file.path,
+    //         name: file.filename
+    //     }
+    // }
     
 }

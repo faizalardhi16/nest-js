@@ -6,9 +6,14 @@ import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { AssessmentModule } from './assessment/assessment.module';
 import { InterviewModule } from './interview/interview.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..'),
+    }),
     AuthModule, 
     PrismaModule, 
     UserModule, 

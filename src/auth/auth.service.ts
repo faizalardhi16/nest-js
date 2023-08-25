@@ -50,6 +50,8 @@ export class AuthService {
                     })
                 }
             }
+
+            console.log(`${new Date()} - ${error}`)
             return objectResponse({ 
                 status: 'Failed', 
                 code: 422, 

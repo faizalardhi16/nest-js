@@ -33,23 +33,34 @@ export class UserService {
     }
 
     async updateUser(body: EditUserInterface): Promise<ResponseInterface>{
-        const {data, param} = body;
+        try {
+            const {data, param} = body;
 
-        const user:User = await this.prisma.user.update({
-            where: {
-                email: param
-            },
-            data
-        });
+            const transaction = this.prisma.user.update({
+                where: {
+                    email: param
+                },
+                data
+            });
 
-        delete user.hash;
+            const user = await this.prisma.$transaction([transaction])
 
-        return objectResponse({
-            code: 200,
-            status: 'Success',
-            message: "Success to update data",
-            data: user
-        })
+            delete user[0].hash;
+
+            return objectResponse({
+                code: 200,
+                status: 'Success',
+                message: "Success to update data",
+                data: user
+            })
+        } catch (error) {
+            return objectResponse({
+                code: 500,
+                status: 'Failed',
+                message: "Failed4 to update data",
+                data: null
+            })
+        }
     }
 
     async findOneUser(email: string): Promise<ResponseInterface>{

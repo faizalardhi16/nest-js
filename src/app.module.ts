@@ -8,6 +8,8 @@ import { AssessmentModule } from './assessment/assessment.module';
 import { InterviewModule } from './interview/interview.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { S3Service } from './s3/s3.service';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { join } from 'path';
       isGlobal: true,
       envFilePath: '.env'
     }), 
-    DatabaseModule, AssessmentModule, InterviewModule
+    DatabaseModule, AssessmentModule, InterviewModule, S3Module
   ],
 })
 export class AppModule {}

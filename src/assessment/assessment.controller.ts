@@ -10,10 +10,11 @@ import { RoleGuard } from 'src/auth/strategy/role.strategy';
 import { Assessment } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { S3Service } from 'src/s3/s3.service';
 
 @Controller('assessment')
 export class AssessmentController {
-    constructor(private service: AssessmentService){}
+    constructor(private service: AssessmentService, private s3Service: S3Service){}
 
     @Roles(Role.ASSESSI)
     @UseGuards(AuthGuard('jwt'), RoleGuard)
@@ -50,21 +51,20 @@ export class AssessmentController {
 
     @Post('local')
     @UseInterceptors(
-      FileInterceptor('file', {
-        storage: diskStorage({
-          destination: (req,file,cb) => {
-            cb(null, 'public/img')
-          },
-          filename: (req, file, cb) => {
-            cb(null, file.originalname);
-          },
-        }),
-      }),
+      FileInterceptor('file'),
     )
-    async local(@UploadedFile() file: Express.Multer.File) {
+    async local(@UploadedFile(
+      new ParseFilePipe({
+        validators:[
+            new MaxFileSizeValidator({maxSize: 1024 * 1024 * 5}),
+            new FileTypeValidator({fileType: 'image/*'})
+        ]
+      })
+    ) file: Express.Multer.File) {
+      const response = await this.s3Service.uploadFile(file.buffer, file.mimetype);
       return {
         statusCode: 200,
-        data: file.path,
+        data: response,
       };
     }
 

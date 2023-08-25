@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
@@ -16,6 +16,6 @@ RUN pnpm run build
 
 EXPOSE 3121
 
-RUN npx prisma migrate dev --name migrate_database
+# RUN npx prisma migrate dev --name migrate_database
 
 CMD ["node", "dist/src/main.js"]

@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { ICreateCategory } from './interface/ICreateCategory';
 import { objectResponse } from 'utils/objectResponse';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
@@ -57,12 +57,8 @@ export class CategoryService {
             const result = await this.prisma.category.findUnique({where: {code: id}});
 
             if(!result){
-                return objectResponse({
-                    code: HttpStatus.FORBIDDEN,
-                    status: 'Failed',
-                    message: 'We don`t have any value with code : ' + id,
-                    data: null 
-                })
+                const message = 'We don`t have any value with code : ' + id
+                throw new ForbiddenException(message)
             }
 
             await this.prisma.category.delete({where: {code: id}});

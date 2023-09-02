@@ -71,14 +71,7 @@ export class UserService {
         });    
 
         if(!user){
-            const exc = new ForbiddenException("Credential not found")
-
-            return objectResponse({
-                code: exc.getStatus(),
-                status: 'Failed',
-                message: exc.message,
-                data: null
-            })
+            throw new ForbiddenException("Credential not found")
         }
 
         delete user.hash

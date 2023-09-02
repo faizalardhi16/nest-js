@@ -65,13 +65,7 @@ export class InterviewService {
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code === 'P2002'){
-                    const exc = new ForbiddenException("Failed to Edit");
-                    return objectResponse({
-                        code: exc.getStatus(),
-                        message: exc.message,
-                        data: null,
-                        status: 'Failed'
-                    })
+                    throw new ForbiddenException("Failed to Edit");
                 }
             }
             

@@ -46,13 +46,7 @@ export class AssessmentService {
             });
 
             if(!assessment){
-                const exc = new ForbiddenException("Assessment not found");
-                return objectResponse({
-                    code: exc.getStatus(),
-                    message: exc.message,
-                    status: 'Failed',
-                    data: null
-                });
+                throw new ForbiddenException("Assessment not found");
             }
 
             return objectResponse({
@@ -99,14 +93,7 @@ export class AssessmentService {
         });
 
         if(!assessment){
-            const exc = new ForbiddenException('Assessment Not Found');
-
-            return objectResponse({
-                code: exc.getStatus(),
-                status: 'Failed',
-                message: exc.message,
-                data: null
-            })
+            throw new ForbiddenException('Assessment Not Found');
         }
 
         delete assessment.user.hash

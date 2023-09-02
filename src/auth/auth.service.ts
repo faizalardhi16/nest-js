@@ -41,13 +41,7 @@ export class AuthService {
         } catch (error) {
             if(error instanceof PrismaClientKnownRequestError){
                 if(error.code = 'P2002'){
-                    const exc = new ForbiddenException('Credentials Taken')                    
-                    return objectResponse({ 
-                        status: 'Failed', 
-                        code: exc.getStatus(), 
-                        message: exc.message, 
-                        data: null
-                    })
+                    throw new ForbiddenException('Credentials Taken')                     
                 }
             }
 
@@ -69,25 +63,13 @@ export class AuthService {
         });
 
         if(!user){
-            const exc = new ForbiddenException("Credentials Incorrect") 
-            return objectResponse({ 
-                status: 'Failed', 
-                code: exc.getStatus(), 
-                message: exc.message, 
-                data: null
-            });
+            throw new ForbiddenException("Credentials Incorrect") 
         }
 
         const pwMatches = await argon.verify(user.hash, body.password);
 
         if(!pwMatches){
-            const exc = new ForbiddenException("Credentials Incorrect") 
-            return objectResponse({ 
-                status: 'Failed', 
-                code: exc.getStatus(), 
-                message: exc.message, 
-                data: null
-            });
+            throw new ForbiddenException("Credentials Incorrect") 
         }
 
         const token = await this.signToken(user.id, user.email, user.role);
@@ -114,7 +96,7 @@ export class AuthService {
         const secret = process.env.JWT_SECRET || ''
 
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '1h',
             secret
         })
 

@@ -12,7 +12,7 @@ COPY . .
 
 RUN npx prisma generate
 
-RUN pnpm run build
+RUN set NODE_ENV=production && pnpm run build
 
 EXPOSE 3121
 

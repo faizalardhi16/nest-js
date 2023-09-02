@@ -10,87 +10,104 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id Int @id @default(autoincrement())
+model User {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(dbgenerated("NOW() + interval '7 hours'"))
   updatedAt DateTime @updatedAt
 
-  email String @unique
-  hash String
-  role String?
-  pc   Int
+  email    String  @unique
+  hash     String
+  role     String?
+  pc       Int
   division String
-  
 
   firstName String?
-  lastName String?
-  address String?
+  lastName  String?
+  address   String?
 
-  bookmark Bookmark[]
+  bookmark   Bookmark[]
   assessment Assessment[]
-  interview Interview[]
+  interview  Interview[]
 
   @@map("users")
-
 }
 
-model Bookmark{
-  id Int @id @default(autoincrement())
+model Bookmark {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title String
+  title       String
   description String?
-  link String
+  link        String
 
   userId Int
-  user User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   @@map("bookmarks")
 }
 
-model Assessment{
-  id Int @id @default(autoincrement())
+model Assessment {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   title_assesse String
-  description String @db.Text
-  file_name String?
-  user_id Int
+  description   String  @db.Text
+  file_name     String?
+  user_id       Int
 
   category_id Int
+  question_id Int
 
-  user User @relation(fields: [user_id], references: [id])
+  user     User     @relation(fields: [user_id], references: [id])
   category Category @relation(fields: [category_id], references: [id])
+  question Question @relation(fields: [question_id], references: [id])
 
   @@map("assessments")
 }
 
-model Category{
-  id Int @id @default(autoincrement())
+model Category {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   title String
-  code String @unique
+  code  String @unique
 
   assessment Assessment[]
+  question   Question[]
 
   @@map("categories")
 }
 
-model Interview{
-  id Int @id @default(autoincrement())
+model Interview {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title String
+  title       String
   description String
-  user_id Int
+  user_id     Int
 
   user User @relation(fields: [user_id], references: [id])
 
   @@map("interviews")
 }
 
+model Question {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  description String
+
+  category_id Int
+
+  assessment Assessment[]
+
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@map("questions")
+}

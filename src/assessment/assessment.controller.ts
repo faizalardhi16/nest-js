@@ -9,10 +9,12 @@ import { Roles } from 'utils/roles.decorator';
 import { RoleGuard } from 'src/auth/strategy/role.strategy';
 import { Assessment } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { S3Service } from 'src/s3/s3.service';
+import { S3Service } from 'src/libs/s3/s3.service';
 
-@Controller('assessment')
+@Controller({
+  path: 'assessment',
+  version: ['1']
+})
 export class AssessmentController {
     constructor(private service: AssessmentService, private s3Service: S3Service){}
 
@@ -20,7 +22,7 @@ export class AssessmentController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Post('create')
     @HttpCode(HttpStatus.OK)
-    saveAssessment(@Body() body: ICreateAssessment, @Req() req: RequestUserInterface): Promise<ResponseInterface>{
+    public async saveAssessment(@Body() body: ICreateAssessment, @Req() req: RequestUserInterface): Promise<ResponseInterface>{
         return this.service.createAssessment({...body, user_id: req.user.sub})
     }
 
@@ -28,7 +30,7 @@ export class AssessmentController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Patch('update')
     @HttpCode(HttpStatus.OK)
-    updateAssessment(@Body() body: Partial<Assessment>): Promise<ResponseInterface>{
+    public async updateAssessment(@Body() body: Partial<Assessment>): Promise<ResponseInterface>{
         return this.service.editAssessment(body)
     }
 
@@ -36,7 +38,7 @@ export class AssessmentController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Get()
     @HttpCode(HttpStatus.OK)
-    getAssessment(@Query() query: {user_id: number;}): Promise<ResponseInterface>{
+    public async getAssessment(@Query() query: {user_id: number;}): Promise<ResponseInterface>{
         const user_id = Number(query.user_id);
         return this.service.findAssessment(user_id);
     }
@@ -45,7 +47,7 @@ export class AssessmentController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    getDetailAssessment(@Param() param:{id: number;}): Promise<ResponseInterface>{
+    public async getDetailAssessment(@Param() param:{id: number;}): Promise<ResponseInterface>{
         return this.service.findOneAssessment(param.id)
     }
 
@@ -53,7 +55,7 @@ export class AssessmentController {
     @UseInterceptors(
       FileInterceptor('file'),
     )
-    async local(@UploadedFile(
+    public async local(@UploadedFile(
       new ParseFilePipe({
         validators:[
             new MaxFileSizeValidator({maxSize: 1024 * 1024 * 5}),
@@ -62,33 +64,11 @@ export class AssessmentController {
       })
     ) file: Express.Multer.File) {
       const response = await this.s3Service.uploadFile(file.buffer, file.mimetype);
+      console.log(response, "RESP")
       return {
         statusCode: 200,
         data: response,
       };
     }
 
-    // @Post('upload')
-    // @UseInterceptors(FileInterceptor('file', {
-    //     storage: diskStorage({
-    //         destination: "public/img",
-    //         filename: (req, file, cb) => {
-    //             cb(null, file.originalname + 'hello')
-    //         }
-    //     })
-    // }))
-    // uploadFile(@UploadedFile(
-    //     new ParseFilePipe({
-    //         validators:[
-    //             new MaxFileSizeValidator({maxSize: 1024 * 1024 * 5}),
-    //             new FileTypeValidator({fileType: 'application/pdf'})
-    //         ]
-    //     })
-    // ) file: Express.Multer.File){
-    //     return{
-    //         path: file.path,
-    //         name: file.filename
-    //     }
-    // }
-    
 }

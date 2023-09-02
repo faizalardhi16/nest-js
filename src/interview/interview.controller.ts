@@ -17,7 +17,7 @@ export class InterviewController {
     @UseGuards(AuthGuard('jwt'),RoleGuard)
     @Post()
     @HttpCode(HttpStatus.OK)
-    createInterview(@Body() body:InterviewRequestProp): Promise<ResponseInterface>{
+    public async createInterview(@Body() body:InterviewRequestProp): Promise<ResponseInterface>{
         return this.service.saveInterview(body);
     }
 
@@ -25,7 +25,7 @@ export class InterviewController {
     @UseGuards(AuthGuard('jwt'),RoleGuard)
     @Get()
     @HttpCode(HttpStatus.OK)
-    searchInterview(@Query() query: IQueryFindInterview): Promise<ResponseInterface>{
+    public async searchInterview(@Query() query: IQueryFindInterview): Promise<ResponseInterface>{
         console.log("GET", query)
         return this.service.findInterview(query)
     }
@@ -35,7 +35,7 @@ export class InterviewController {
     @UseGuards(AuthGuard('jwt'),RoleGuard)
     @Patch()
     @HttpCode(HttpStatus.OK)
-    updateInterview(@Body() body: Partial<Interview>): Promise<ResponseInterface>{
+    public async updateInterview(@Body() body: Partial<Interview>): Promise<ResponseInterface>{
         return this.service.editInterview(body);
     }
     

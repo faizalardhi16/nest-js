@@ -3,7 +3,10 @@ import { AuthService } from './auth.service';
 import { AuthInterface, LoginInterface } from './interface';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 
-@Controller('auth')
+@Controller({
+    path: 'auth',
+    version: ['1']
+})
 export class AuthController {
     private readonly authService: AuthService;
 
@@ -14,13 +17,13 @@ export class AuthController {
     // @Roles(Role.ADMIN)
     @Post('signup')
     @HttpCode(HttpStatus.OK)
-    registerUser(@Body() body: AuthInterface): Promise<ResponseInterface>{
+    public async registerUser(@Body() body: AuthInterface): Promise<ResponseInterface>{
         return this.authService.signup(body);
     }
 
     @Post('signin')
     @HttpCode(HttpStatus.OK)
-    loginUser(@Body() body: LoginInterface): Promise<ResponseInterface>{
+    public async loginUser(@Body() body: LoginInterface): Promise<ResponseInterface>{
         return this.authService.signin(body);
     }
 }

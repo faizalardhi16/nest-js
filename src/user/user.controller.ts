@@ -4,12 +4,15 @@ import { RoleGuard } from 'src/auth/strategy/role.strategy';
 import { Role } from 'utils/role.enum';
 import { Roles } from 'utils/roles.decorator';
 import { UserService } from './user.service';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from 'src/libs/database/database.service';
 import { User } from '@prisma/client';
 import { EditUserInterface, RequestUserInterface } from './interface/UserInterface';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 
-@Controller('user')
+@Controller({
+    path: 'user',
+    version: ['v1']
+})
 export class UserController {
     constructor(private service: UserService, private db: DatabaseService){}
 
@@ -17,7 +20,7 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Get()
     @HttpCode(HttpStatus.OK)
-    getUser(@Req() req: RequestUserInterface){
+    public async getUser(@Req() req: RequestUserInterface){
         return this.service.findOneUser(req.user.email)
     }
 
@@ -25,14 +28,14 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Get("userlist")
     @HttpCode(HttpStatus.OK)
-    GetUserList(@Query() query: {email: string;}): Promise<ResponseInterface>{
+    public async GetUserList(@Query() query: {email: string;}): Promise<ResponseInterface>{
         return this.service.findAllUser(query);
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Patch('edituser')
     @HttpCode(HttpStatus.OK)
-    EditUser(@Body() body: Partial<User>, @Req() req: RequestUserInterface): Promise<ResponseInterface>{
+    public async EditUser(@Body() body: Partial<User>, @Req() req: RequestUserInterface): Promise<ResponseInterface>{
         const payload: EditUserInterface = {
             data: body,
             param: req.user.email
@@ -45,7 +48,7 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Delete("delete")
     @HttpCode(HttpStatus.OK)
-    RemoveUser(@Body() body: {email: string;}): Promise<ResponseInterface>{
+    public async RemoveUser(@Body() body: {email: string;}): Promise<ResponseInterface>{
         return this.service.deleteUser(body.email);
     }
 
@@ -53,14 +56,8 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), RoleGuard)
     @Get('detail/:email')
     @HttpCode(HttpStatus.OK)
-    UserDetail(@Param() params: {email: string;}): Promise<ResponseInterface>{
+    public async UserDetail(@Param() params: {email: string;}): Promise<ResponseInterface>{
         return this.service.findOneUser(params.email)
     }
 
-    // @Get('test')
-    // async GetListTest(){
-    //     const tes = await this.db.executeQuery("select * from users");
-        
-    //     return tes
-    // }
 }

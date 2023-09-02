@@ -10,7 +10,12 @@ export class ICreateAssessment{
     @IsNotEmpty()
     category_id: number;
 
+    @IsNotEmpty()
+    question_id: number;
+
     user_id: number;
+
+    file_name: string;
 }
 
 export interface IFindAllAssessment{

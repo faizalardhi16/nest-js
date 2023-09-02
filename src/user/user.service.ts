@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/libs/prisma/prisma.service';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 import { objectResponse } from 'utils/objectResponse';
 import { EditUserInterface } from './interface/UserInterface';
@@ -9,7 +9,7 @@ import { EditUserInterface } from './interface/UserInterface';
 export class UserService {
     constructor(private prisma: PrismaService){}
 
-    async findAllUser(query: {email: string;}): Promise<ResponseInterface>{
+    public async findAllUser(query: {email: string;}): Promise<ResponseInterface>{
         const userList: User[] = await this.prisma.user.findMany({
             where: {
                 email: {
@@ -32,7 +32,7 @@ export class UserService {
         })
     }
 
-    async updateUser(body: EditUserInterface): Promise<ResponseInterface>{
+    public async updateUser(body: EditUserInterface): Promise<ResponseInterface>{
         try {
             const {data, param} = body;
 
@@ -63,7 +63,7 @@ export class UserService {
         }
     }
 
-    async findOneUser(email: string): Promise<ResponseInterface>{
+    public async findOneUser(email: string): Promise<ResponseInterface>{
         const user: User = await this.prisma.user.findUnique({
             where: {
                 email
@@ -91,7 +91,7 @@ export class UserService {
         })
     }
 
-    async deleteUser(email: string): Promise<ResponseInterface>{
+    public async deleteUser(email: string): Promise<ResponseInterface>{
         try {
             const user: User = await this.prisma.user.delete({
                 where:{

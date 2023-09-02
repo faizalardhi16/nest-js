@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/libs/prisma/prisma.service';
 import { InterviewRequestProp } from './interface/InterviewRequestProp';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 import { objectResponse } from 'utils/objectResponse';
@@ -11,7 +11,7 @@ import { Interview } from '@prisma/client';
 export class InterviewService {
     constructor(private prisma: PrismaService){}
 
-    async saveInterview(body: InterviewRequestProp): Promise<ResponseInterface>{
+    public async saveInterview(body: InterviewRequestProp): Promise<ResponseInterface>{
         const interview = await this.prisma.interview.create({
             data: {
                 title: body.title,
@@ -29,7 +29,7 @@ export class InterviewService {
         });
     }
 
-    async findInterview(query: IQueryFindInterview): Promise<ResponseInterface>{
+    public async findInterview(query: IQueryFindInterview): Promise<ResponseInterface>{
         let whereClause: any = {
             where: {}
         }
@@ -47,7 +47,7 @@ export class InterviewService {
         })
     }
 
-    async editInterview(data: Partial<Interview>): Promise<ResponseInterface>{
+    public async editInterview(data: Partial<Interview>): Promise<ResponseInterface>{
         try {
            const interview = await this.prisma.interview.update({
             where: {

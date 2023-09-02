@@ -1,4 +1,5 @@
 export enum Division{
     Sales = "Sales",
-    Marketing = "Marketing"
+    Marketing = "Marketing",
+    IT = "IT"
 }

@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/libs/prisma/prisma.service';
 import { ICreateAssessment, IFindAllAssessment } from './interface/IRequestAssessment';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 import { objectResponse } from 'utils/objectResponse';
@@ -9,15 +9,17 @@ import { Assessment } from '@prisma/client';
 export class AssessmentService {
     constructor(private prisma: PrismaService){}
 
-    async createAssessment(body: ICreateAssessment): Promise<ResponseInterface>{
-        const {title_assessment, description, category_id, user_id} = body
+    public async createAssessment(body: ICreateAssessment): Promise<ResponseInterface>{
+        const {title_assessment, description, category_id, user_id, file_name, question_id} = body
         try {
             const assessment = await this.prisma.assessment.create({
                 data:{
                     title_assesse: title_assessment,
                     description,
                     category_id,
-                    user_id
+                    user_id,
+                    file_name,
+                    question_id
                 }
             });
 
@@ -34,7 +36,7 @@ export class AssessmentService {
         }
     }
 
-    async editAssessment(body: Partial<Assessment>): Promise<ResponseInterface>{
+    public async editAssessment(body: Partial<Assessment>): Promise<ResponseInterface>{
         try {
             const assessment = await this.prisma.assessment.update({
                 where: {
@@ -65,7 +67,7 @@ export class AssessmentService {
 
     }
 
-    async findAssessment(user_id: number): Promise<ResponseInterface>{
+    public async findAssessment(user_id: number): Promise<ResponseInterface>{
 
         let whereClause: IFindAllAssessment;
 
@@ -86,7 +88,7 @@ export class AssessmentService {
         })
     }
 
-    async findOneAssessment(id: number): Promise<ResponseInterface>{
+    public async findOneAssessment(id: number): Promise<ResponseInterface>{
         const assessment = await this.prisma.assessment.findUnique({
             where: {
                 id: Number(id)

@@ -3,7 +3,7 @@ import { AuthInterface, LoginInterface } from './interface';
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 import { objectResponse } from 'utils/objectResponse';
 import * as argon from "argon2";
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/libs/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 
@@ -12,7 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService){}
 
-    async signup(body: AuthInterface): Promise<ResponseInterface> {
+    public async signup(body: AuthInterface): Promise<ResponseInterface> {
         try {
             //generate password hash
             const hash = await argon.hash(body.password);
@@ -61,7 +61,7 @@ export class AuthService {
         }
     }
 
-    async signin(body: LoginInterface): Promise<ResponseInterface>{
+    public async signin(body: LoginInterface): Promise<ResponseInterface>{
         const user = await this.prisma.user.findUnique({
             where:{
                 email: body.email
@@ -100,7 +100,7 @@ export class AuthService {
         });
     }
 
-    async signToken(
+    private async signToken(
         userId: number, 
         email: string,
         role: string
@@ -123,9 +123,4 @@ export class AuthService {
         }
     }
 
-    // async updateUser(body: Partial<AuthInterface>): Promise<ResponseInterface>{
-    //     const user = await this.prisma.user.update({ data: {}, where: {id: body.id}})
-
-    //     return objectResponse({ status: 'Success', code: 200, message: 'Successfully Update User', data: user})
-    // }
 }

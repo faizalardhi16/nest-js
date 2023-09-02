@@ -26,6 +26,6 @@ import { QuestionModule } from './question/question.module';
       envFilePath: '.env'
     }), 
     DatabaseModule, AssessmentModule, InterviewModule, S3Module, QuestionModule
-  ],
+  ]
 })
 export class AppModule {}

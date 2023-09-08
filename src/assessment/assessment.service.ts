@@ -4,22 +4,30 @@ import { ICreateAssessment, IFindAllAssessment } from './interface/IRequestAsses
 import { ResponseInterface } from 'utils/interface/ResponseInterface';
 import { objectResponse } from 'utils/objectResponse';
 import { Assessment } from '@prisma/client';
+import { S3Service } from 'src/libs/s3/s3.service';
 
 @Injectable()
 export class AssessmentService {
-    constructor(private prisma: PrismaService){}
+    constructor(private prisma: PrismaService, private s3Service: S3Service){}
 
-    public async createAssessment(body: ICreateAssessment): Promise<ResponseInterface>{
-        const {title_assessment, description, category_id, user_id, file_name, question_id} = body
+    public async createAssessment(body: ICreateAssessment & {file: Express.Multer.File}): Promise<ResponseInterface>{
+        const {title_assessment, description, category_id, user_id, question_id, file} = body
         try {
+
+            const response = await this.s3Service.uploadFile(file.buffer, file.mimetype)
+
+            if(!response){
+                throw new ForbiddenException("Failed to upload")
+            }
+
             const assessment = await this.prisma.assessment.create({
                 data:{
                     title_assesse: title_assessment,
                     description,
-                    category_id,
+                    category_id: Number(category_id),
                     user_id,
-                    file_name,
-                    question_id
+                    file_name: response,
+                    question_id: Number(question_id)
                 }
             });
 
@@ -73,6 +81,12 @@ export class AssessmentService {
 
 
         const assessment = await this.prisma.assessment.findMany(whereClause);
+
+        for(const a of assessment){
+            const url = await this.s3Service.getPresignedUrl(a.file_name)
+            console.log(url, "URL")
+            Object.assign(a,{file_url: url});
+        }
 
         return objectResponse({
             code: 200,

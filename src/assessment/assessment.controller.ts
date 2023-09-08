@@ -20,10 +20,21 @@ export class AssessmentController {
 
     @Roles(Role.ASSESSI)
     @UseGuards(AuthGuard('jwt'), RoleGuard)
+    @UseInterceptors(
+      FileInterceptor('file'),
+    )
     @Post('create')
     @HttpCode(HttpStatus.OK)
-    public async saveAssessment(@Body() body: ICreateAssessment, @Req() req: RequestUserInterface): Promise<ResponseInterface>{
-        return this.service.createAssessment({...body, user_id: req.user.sub})
+    public async saveAssessment(
+      @UploadedFile(
+        new ParseFilePipe({
+          validators:[
+              new MaxFileSizeValidator({maxSize: 1024 * 1024 * 5}),
+              new FileTypeValidator({fileType: 'image/*'})
+          ]
+        })
+      ) file: Express.Multer.File, @Body() body: ICreateAssessment, @Req() req: RequestUserInterface): Promise<ResponseInterface>{
+        return this.service.createAssessment({...body, user_id: req.user.sub, file: file})
     }
 
     @Roles(Role.ASSESSI)
@@ -62,12 +73,12 @@ export class AssessmentController {
             new FileTypeValidator({fileType: 'image/*'})
         ]
       })
-    ) file: Express.Multer.File) {
-      const response = await this.s3Service.uploadFile(file.buffer, file.mimetype);
-      console.log(response, "RESP")
+    ) file: Express.Multer.File, @Body() body: ICreateAssessment) {
+      // const response = await this.s3Service.uploadFile(file.buffer, file.mimetype);
+      console.log(body, "RESP")
       return {
         statusCode: 200,
-        data: response,
+        data: "",
       };
     }
 

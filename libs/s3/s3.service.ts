@@ -11,7 +11,7 @@ export class S3Service {
         try {
             const filename = `${uuidv4()}.${mimeType.split("/")[1]}`
             const params = {
-                Bucket: 'miagobucket',
+                Bucket: process.env.AWS_BUCKET_NAME,
                 Key: filename,
                 Body: file
             }
